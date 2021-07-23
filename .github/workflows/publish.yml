@@ -1,0 +1,33 @@
+# This workflow will do a clean install of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Publish
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish:
+    name: Publish for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: mything
+            asset_name: mything-linux-amd64
+          - os: windows-latest
+            artifact_name: mything.exe
+            asset_name: mything-windows-amd64
+          - os: macos-latest
+            artifact_name: mything
+            asset_name: mything-macos-amd64
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v2.3.0
+    - run: npm ci
+    - run: npm run tauri build --if-present
